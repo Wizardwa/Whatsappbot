@@ -20,12 +20,13 @@ click = pyautogui.click()
 #move to the next position x=960 y=487
 time.sleep(18)
 
-position_ok = pyautogui.moveTo(x=960, y=487)
+#position_ok = pyautogui.moveTo(x=960, y=487)
+locate_ok = pyautogui.locateOnScreen('ok.png')
 click = pyautogui.click()
 
 #write something on the screen
 
-keyboard = pyautogui.typewrite("This is good\n")
+keyboard = pyautogui.typewrite("Code is working\n")
 time.sleep(2)
 
 try:
@@ -34,3 +35,4 @@ try:
    #os.system('clear')
 except KeyboardInterrupt:
     os.system('clear')
+
