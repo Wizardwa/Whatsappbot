@@ -25,7 +25,7 @@ click = g.click()
 #new tab
 tab = g.hotkey('ctrl', 't')
 
-search = g.typewrite("https://web.whatsapp.com/")
+search = g.typewrite("https://web.whatsapp.com/", interval=0.1)
 enter = g.hotkey('enter')
 time.sleep(15)
 screenshot = g.screenshot('whatsapphome.png')
@@ -34,27 +34,29 @@ screenshot = g.screenshot('whatsapphome.png')
 time.sleep(2)
 try:
     #locate = g.moveTo(x=372, y=244)
-    unread = Search("green.png")
-    pos_green_dot = unread.imagesearch()
-    if pos_green_dot[0] != -1:
-        print("position : ", pos_green_dot[0], pos_green_dot[1])
+    search = Search("green.png")
+    pos = search.imagesearch()
+    if pos[0] != -1:
+        print("green_pos : ", pos[0], pos[1])
         click = g.click()
+
+        #copy text
+        message_box = g.moveTo(x=524, y=672)
+        double_click = g.click(clicks=2)
+        copy = g.hotkey('ctrl', 'c')
+        time.sleep(2)
+        #word = g.hotkey('ctrl', 'v')
+
+        #Reply
+        reply = g.moveTo(x=560, y=674)
+        click = g.click()
+        drop_down = g.moveTo(x=612, y=449)
+        click = g.click()
+        textbox = g.moveTo(x=562, y=729)
+        click = g.click()
+        message = g.typewrite("Whats good blud", interval=0.1)
+        send = g.hotkey('enter')
+    else:
+        print("Image not found")
 except g.ImageNotFoundException:
     print("Image not found")
-
-#copy text
-message_box = g.moveTo(x=524, y=672)
-double_click = g.click(clicks=2)
-copy = g.hotkey('ctrl', 'c')
-time.sleep(2)
-#word = g.hotkey('ctrl', 'v')
-
-#Reply
-reply = g.moveTo(x=560, y=674)
-click = g.click()
-drop_down = g.moveTo(x=612, y=449)
-click = g.click()
-textbox = g.moveTo(x=562, y=729)
-click = g.click()
-message = g.typewrite("Whats good blud", interval=0.1)
-send = g.hotkey('enter')
