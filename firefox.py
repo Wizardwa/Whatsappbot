@@ -4,9 +4,21 @@ import os
 import sys
 import pyautogui as g
 import time
+from screen_search import *
 
 #Position firefox x=25 y=53
-firefox = g.moveTo(x=25, y=53)
+#firefox = g.moveTo(x=25, y=53)
+
+search = Search("firedox.png")
+
+pos = search.imagesearch()
+
+if pos[0] != -1:
+    print("position : ", pos[0], pos[1])
+    pyautogui.moveTo(pos[0], pos[1])
+    click = pyautogui.click()
+else:
+    print("Image not found")
 
 click = g.click()
 
@@ -15,13 +27,20 @@ tab = g.hotkey('ctrl', 't')
 
 search = g.typewrite("https://web.whatsapp.com/")
 enter = g.hotkey('enter')
-time.sleep(10)
+time.sleep(15)
 screenshot = g.screenshot('whatsapphome.png')
 #Check for new messages
-new_message = g.moveTo(x=411 , y=253 )
+#new_message = g.moveTo(x=411 , y=253 )
 time.sleep(2)
-#green_dot = pyautogui.locateOnScreen('green.png')
-click = g.click()
+try:
+    #locate = g.moveTo(x=372, y=244)
+    unread = Search("green.png")
+    pos_green_dot = unread.imagesearch()
+    if pos_green_dot[0] != -1:
+        print("position : ", pos_green_dot[0], pos_green_dot[1])
+        click = g.click()
+except g.ImageNotFoundException:
+    print("Image not found")
 
 #copy text
 message_box = g.moveTo(x=524, y=672)
