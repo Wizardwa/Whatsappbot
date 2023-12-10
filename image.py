@@ -1,15 +1,12 @@
 #!/bin/python3
 
-from screen_search import *
-import pyautogui
+import time
+import pyautogui as p
 
-search = Search("firedox.png")
+time.sleep(5)
+#locate = p.locateCenterOnScreen('unread.png', confidence=0.9)
+#pos = locate
 
-pos = search.imagesearch()
-
-if pos[0] != -1:
-	print("position : ", pos[0], pos[1])
-	pyautogui.moveTo(pos[0], pos[1])
-	click = pyautogui.click()
-else:
-	print("Image not found")
+p.moveTo(x=372, y=244)
+p.click()
+#print("position: ", pos[0], pos[1])
