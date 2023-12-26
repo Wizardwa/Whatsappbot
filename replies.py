@@ -25,6 +25,8 @@ def replies(paste):
 		message = "sina maneno"
 	elif paste == "we mzee" or "wee mzee":
 		message = "Unasemaje"
+	elif paste == "uko aje morio":
+		message = "Niko fiti mkuu inakuwa aje"
 	else:
 		message = "Hi"
 	return message
