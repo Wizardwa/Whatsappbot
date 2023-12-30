@@ -9,21 +9,14 @@ import tkinter as tk
 from replies import replies
 from game import choices
 from gemini import response
+from multi import photo
+from multimodal import multi_modal
 import pyscreenshot as screen
+import clipboard
+from generate import *
+import re
+import subprocess
 
-#Position firefox x=25 y=53
-#firefox = g.moveTo(x=25, y=53)
-
-"""search = Search("firedox.png")
-
-pos = search.imagesearch()
-
-if pos[0] != -1:
-    print("position : ", pos[0], pos[1])
-    pyautogui.moveTo(pos[0], pos[1])
-    click = pyautogui.click()
-else:
-    print("Image not found")"""
 locate = g.locateCenterOnScreen("firedox.png", confidence=0.5) 
 pos = locate
 g.moveTo(pos[0], pos[1])
@@ -61,21 +54,24 @@ while True:
 
             return theme
 
-        #theme = themes(sample)
         def unread():
             theme = themes()
             unread = g.locateOnScreen(theme, confidence=0.9)
             #copy = g.hotkey('ctrl', 'c')
             g.moveTo(unread[0]-20, unread[1])
+            locate = g.moveTo(x=372, y=244)
             click = g.click()
             time.sleep(2)
-            locate = g.moveTo(x=372, y=244)
+
+            
+            
+
+        def text():
             locate_text = g.moveTo(x=518, y=672)
-            time.sleep(1)
-            #locate_text = g.moveTo(x=524, y=672)
             double_click = g.click(clicks=3)
             copy = g.hotkey('ctrl', 'c')
-
+            time.sleep(1)
+            #locate_text = g.moveTo(x=524, y=672)
             #Tk
             root = tk.Tk()
             root.withdraw()
@@ -86,32 +82,54 @@ while True:
             time.sleep(2)
 
             #print text
-            print("Message says: \n") 
-            print(paste)
+            print(f"Message says: {paste}")
+
+            #matched = ['image','photo','picture','draw','pic']
+
+            if "image" in paste:
+                image_generation(paste)
+                image_name = subprocess.check_output(['./local_images.sh'], stderr=subprocess.STDOUT, text=True)
+                image_name = image_name.strip()
+                image_path = "images" + '/' + image_name
+                subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-i', image_path])
+                #textbox = g.moveTo(x=562, y=729)
+                #click = g.click()
+                send = g.hotkey('ctrl', 'v')
+                send = g.hotkey('enter')
+                time.sleep(2)
+                send = g.hotkey('enter')
+                paste = ""
+
+
 
             return paste
 
-        unread = unread()
-        paste = unread
+        #check for unread messages
+        unread()
 
-        #Reply
-        #call func if numeric or word 
-        if(paste == "game"):
-            mess = choices(paste)
-        elif(paste == "stop"):
-            break
+        #call to generate image
+
+
+        paste = text()
+        photo = photo()
+
+        if photo != None:
+            mess = multi_modal(photo)
         else:
             mess = response(paste)
+
         def textbox():
-            reply = g.moveTo(x=560, y=674)
-            click = g.click()
-            drop_down = g.moveTo(x=612, y=449)
-            click = g.click()
+            #reply = g.moveTo(x=560, y=674)
+            #click = g.click()
+            #drop_down = g.moveTo(x=612, y=449)
+            #time.sleep(5)
+            #click = g.click()
             textbox = g.moveTo(x=562, y=729)
             click = g.click()
             
         textbox()
+
         reply = g.typewrite(mess, interval=0.1)
         send = g.hotkey('enter')
-    except g.ImageNotFoundException:
+    except (g.ImageNotFoundException,TypeError,ValueError,UnboundLocalError):
         pass
