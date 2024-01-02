@@ -11,6 +11,7 @@ from game import choices
 from gemini import response
 from multi import photo
 from multimodal import multi_modal
+from webscrap import dalle3
 import pyscreenshot as screen
 import clipboard
 from generate import *
@@ -87,7 +88,11 @@ while True:
             #matched = ['image','photo','picture','draw','pic']
 
             if "image" in paste:
-                image_generation(paste)
+                if "real" in paste:
+                    dalle3(paste)
+                else:
+                    image_generation(paste)
+                
                 image_name = subprocess.check_output(['./local_images.sh'], stderr=subprocess.STDOUT, text=True)
                 image_name = image_name.strip()
                 image_path = "images" + '/' + image_name

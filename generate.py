@@ -18,7 +18,7 @@ def image_generation(paste):
             url = "https://api.neural.love/v1/ai-art/generate"
 
             payload = {
-                "style": "PHOTO",
+                "style": "FANTASY",
                 "prompt": prompt,
                 "layout": "SQUARE",
                 "amount": 1,
