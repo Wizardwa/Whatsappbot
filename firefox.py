@@ -60,7 +60,7 @@ while True:
             unread = g.locateOnScreen(theme, confidence=0.9)
             #copy = g.hotkey('ctrl', 'c')
             g.moveTo(unread[0]-20, unread[1])
-            locate = g.moveTo(x=372, y=244)
+            #locate = g.moveTo(x=372, y=244) changed for concurrency 
             click = g.click()
             time.sleep(2)
 

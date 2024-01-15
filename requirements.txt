@@ -1,0 +1,17 @@
+os
+sys
+pyautogui
+time
+screen_search
+tkinter
+pyscreenshot
+clipboard
+re
+subprocess
+json
+requests
+PIL.Image
+random
+string
+google.generativeai
+selenium

@@ -68,4 +68,5 @@ def dalle3(paste):
 
 
 
-    #driver.quit()
+
+#driver.quit()
