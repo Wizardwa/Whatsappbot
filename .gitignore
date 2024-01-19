@@ -1,0 +1,4 @@
+*.swp.py
+*.*.swp.py
+__pycache__
+untitled
