@@ -2,6 +2,7 @@
 
 #web scrapping imgcreator with selenium
 from selenium import webdriver
+from selenium.webdriver import ChromeOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
@@ -15,6 +16,8 @@ import PIL.Image as im
 
 def dalle3(paste):
     prompt = paste
+    opt = webdriver.ChromeOptions()
+    opt.add_argument("--headless")
     driver = webdriver.Chrome()
     driver.get("https://imgcreator.zmo.ai/ai-generator?url=/ai-generator&type=text_input")
 

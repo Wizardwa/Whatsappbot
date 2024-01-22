@@ -11,7 +11,7 @@ from generate import *
 from webscrap import dalle3
 import time
 import pyautogui as g
-import os
+import pyperclip
 
 user_data = os.environ["chrome_user_data"]
 opt = webdriver.ChromeOptions()
@@ -33,17 +33,6 @@ while True:
 			except NoSuchElementException:
 				print("Message not read")
 
-		def locate_image():
-			image_name = subprocess.check_output(['./local_images.sh'], stderr=subprocess.STDOUT, text=True)
-			image_name = image_name.strip()
-			image_path = "images" + '/' + image_name
-			subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-i', image_path])
-			#send image
-			reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
-			reply.send_keys(Keys.CONTROL + "v")
-			reply.send_keys(Keys.ENTER)
-
-
 		#check all of unread messages
 		def all_unread():
 			#no of rows
@@ -62,6 +51,8 @@ while True:
 						username = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[1]/div[1]/div/span").text
 						time_sent = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[1]/div[2]/span").text
 						message = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[1]/span/span").text
+						#store text to clipboard
+						#message = pyperclip.copy(message)
 						no_unread = unread.text
 						yield no_unread,username,message,time_sent,count
 						k += 1
@@ -91,6 +82,19 @@ while True:
 
 		unread_preview()
 
+		def locate_image(count):
+			image_name = subprocess.check_output(['./local_images.sh'], stderr=subprocess.STDOUT, text=True)
+			image_name = image_name.strip()
+			image_path = "images" + '/' + image_name
+			subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-i', image_path])
+			#open chat
+			open_chat = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]").click()
+
+			#send image
+			reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
+			reply.send_keys(Keys.CONTROL + "v")
+			reply.send_keys(Keys.ENTER)
+
 		#message
 		def messages():
 			for k in all_unread():
@@ -99,16 +103,19 @@ while True:
 				count = k[4]
 				#message = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[1]/span/span").text
 				matched = ['image','photo','picture','draw','pic', 'stop']
-				if "image" in message:
-					if "real" in message:
-						paste = message
-						#dalle3(paste)
-					else:
-						paste = message
-						#image_generation(paste)
-					#send image
-					#locate_image()
-					message = ""
+				try:
+					if "generate" in message:
+						if "real" in message:
+							paste = message
+							#dalle3(paste)
+						else:
+							paste = message
+							#image_generation(paste)
+						#send image
+						locate_image(count)
+						message = ""
+				except TypeError:
+					pass
 				yield message,username,count
 		#messages()
 
@@ -120,25 +127,30 @@ while True:
 				username = chat[1]
 				mess = chat[0]
 				open_chat = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]").click()
+
 				yield mess
 
 		#chat()
 		def reply():
 			#reply message
-			for chats in chat():
-				message = chats
-				reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
-				reply.click()
-				reply.send_keys(Keys.CONTROL + "a")
-				reply.send_keys(Keys.DELETE)
-				#gemini
-				paste = message
-				respond = response(paste)
-				reply.send_keys(respond)
+			try:
+				for chats in chat():
+					message = chats
+					reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
+					reply.click()
+					reply.send_keys(Keys.CONTROL + "a")
+					reply.send_keys(Keys.DELETE)
+					#gemini
+					paste = message
+					if paste != "":
+						respond = response(paste)
+						reply.send_keys(respond)
 
-				#send message
-				send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
-				#time.sleep(5)
+					#send message
+					send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
+					#time.sleep(5)
+			except TypeError:
+				pass
 		reply()
 	except (ValueError,StaleElementReferenceException):
 		print("You have a ValueError")
