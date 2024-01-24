@@ -16,7 +16,7 @@ def image_generation(paste):
         try:
             #prompt = paste
             url = "https://api.neural.love/v1/ai-art/generate"
-
+            api = os.environ["neural_love"]
             payload = {
                 "style": "FANTASY",
                 "prompt": prompt,
@@ -33,7 +33,7 @@ def image_generation(paste):
             headers = {
                 "accept": "application/json",
                 "content-type": "application/json",
-                "authorization": "Bearer v1.338aeee31b10839d33be313d661920f9911d37c901dbbd02a06e791cf555f7dd"
+                "authorization": "Bearer " + api
                 }
 
             response = requests.post(url, json=payload, headers=headers)
