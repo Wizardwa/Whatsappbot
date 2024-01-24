@@ -52,10 +52,11 @@ def image_generation(paste):
 
     def check_order_info(order):
         time.sleep(120)
+        api = os.environ["neural_love"]
         url = f"https://api.neural.love/v1/ai-art/orders/{order}"
         headers = {
             "accept": "application/json",
-            "authorization": "Bearer v1.338aeee31b10839d33be313d661920f9911d37c901dbbd02a06e791cf555f7dd"
+            "authorization": "Bearer "+ api
         }
 
         response = requests.get(url, headers=headers)
