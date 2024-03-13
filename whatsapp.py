@@ -12,6 +12,7 @@ from webscrap import dalle3
 import time
 import pyautogui as g
 import pyperclip
+import re
 
 user_data = os.environ["chrome_user_data"]
 opt = webdriver.ChromeOptions()
@@ -24,6 +25,28 @@ time.sleep(20)
 #Chat xpaths /html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]
 while True:
 	try:
+		#Check groups
+		def group_chat():
+			try:
+				group_name = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]/div[1]/div[1]/span").text
+				message = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]/div[2]/div[1]/span/span[2]").text
+				time_sent = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]/div[1]/div[2]/span").text
+
+				#check if tagged
+				if "@Botbot" in message:
+					#open chat
+					#Crap_test = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]").click()
+					Bsc_IT = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]").click()
+					#Remove tag and add space
+					message = re.sub('@Botbot', '', message)
+					#print("This is the new message",message)
+					return message
+			except NoSuchElementException:
+				pass
+
+
+		#group_chat()
+
 		def read():
 			#check if double check exists
 			try:
@@ -43,7 +66,7 @@ while True:
 			count = 1
 			k = 0
 			while count <= no_rows:
-				list_items = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]")
+				#list_items = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]")
 				#print(list_items.text)
 				try:
 					unread = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[2]/span[1]/div")
@@ -131,25 +154,39 @@ while True:
 				yield mess
 
 		#chat()
+		#def reply_box(i):
+			
+		def send_mess(message):
+			#gemini
+			print(message)
+			paste = message
+			if paste != "":
+				respond = response(paste)
+				reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
+				reply.click()
+				reply.send_keys(Keys.CONTROL + "a")
+				reply.send_keys(Keys.DELETE)
+				reply.send_keys(respond)
+				#for i in respond:
+				#	reply.send_keys(i)
+
+				#send message
+				send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
+				#time.sleep(5)
+			else:
+				print("Cannot reply this message")
 		def reply():
 			#reply message
 			try:
+				#check for group messages
+				message = group_chat()
+				send_mess(message)
+				#single chats
 				for chats in chat():
 					message = chats
-					reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
-					reply.click()
-					reply.send_keys(Keys.CONTROL + "a")
-					reply.send_keys(Keys.DELETE)
-					#gemini
-					paste = message
-					if paste != "":
-						respond = response(paste)
-						reply.send_keys(respond)
-
-					#send message
-					send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
-					#time.sleep(5)
-			except TypeError:
+					send_mess(message)
+					
+			except (TypeError, NoSuchElementException):
 				pass
 		reply()
 	except (ValueError,StaleElementReferenceException):
