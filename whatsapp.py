@@ -13,6 +13,7 @@ import time
 import pyautogui as g
 import pyperclip
 import re
+import subprocess
 
 user_data = os.environ["chrome_user_data"]
 opt = webdriver.ChromeOptions()
@@ -28,24 +29,48 @@ while True:
 		#Check groups
 		def group_chat():
 			try:
-				group_name = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]/div[1]/div[1]/span").text
-				message = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]/div[2]/div[1]/span/span[2]").text
-				time_sent = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]/div[1]/div[2]/span").text
+				rows = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div")
+				no_rows = int(rows.get_attribute("aria-rowcount"))
 
-				#check if tagged
-				if "@Botbot" in message:
-					#open chat
-					#Crap_test = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]").click()
-					Bsc_IT = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]").click()
-					#Remove tag and add space
-					message = re.sub('@Botbot', '', message)
-					#print("This is the new message",message)
-					return message
+				#list items
+				count = 1
+				k = 0
+				while count <= no_rows:
+					try:
+						unread = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[2]/span[1]/div")
+						#group with mention
+						group_unread = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[2]/span[1]/div[2]")
+						if unread.is_displayed():
+							no_unread = unread.text
+							#print("No. of unread: ", no_unread)
+							#no_group_unread = group_unread.text
+							#print("No of unread with mentions: ", no_group_unread)
+							group_name = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[1]/div[1]/span").text
+							#print("Group name: ", group_name)
+							message = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[1]/span/span[2]").text
+							#print("Message: ", message)
+							time_sent = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[1]/div[2]/span").text
+							#print("Time sent: ", time_sent)
+							#check if tagged
+							if "@gemini" in message:
+								#open chat
+								group_chat = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]").click()
+								#Remove tag and add space
+								message = re.sub('@gemini', '', message)
+								#print("This is the new message",message)
+										
+								yield message
+
+							k += 1
+					except NoSuchElementException:
+						pass
+					count += 1
 			except NoSuchElementException:
 				pass
 
 
-		#group_chat()
+		#crap = group_chat()
+		#print(crap)
 
 		def read():
 			#check if double check exists
@@ -74,9 +99,11 @@ while True:
 						username = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[1]/div[1]/div/span").text
 						time_sent = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[1]/div[2]/span").text
 						message = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]/div/div/div/div[2]/div[2]/div[1]/span/span").text
+
 						#store text to clipboard
 						#message = pyperclip.copy(message)
 						no_unread = unread.text
+						
 						yield no_unread,username,message,time_sent,count
 						k += 1
 						#call message func
@@ -105,18 +132,19 @@ while True:
 
 		unread_preview()
 
-		def locate_image(count):
+		def locate_image():
 			image_name = subprocess.check_output(['./local_images.sh'], stderr=subprocess.STDOUT, text=True)
 			image_name = image_name.strip()
 			image_path = "images" + '/' + image_name
 			subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-i', image_path])
 			#open chat
-			open_chat = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]").click()
+			#open_chat = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[{count}]").click()
 
 			#send image
 			reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
 			reply.send_keys(Keys.CONTROL + "v")
 			reply.send_keys(Keys.ENTER)
+			send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div").click()
 
 		#message
 		def messages():
@@ -130,17 +158,36 @@ while True:
 					if "generate" in message:
 						if "real" in message:
 							paste = message
-							#dalle3(paste)
+							dalle3(paste)
 						else:
 							paste = message
-							#image_generation(paste)
+							image_generation(paste)
 						#send image
-						locate_image(count)
+						locate_image()
 						message = ""
 				except TypeError:
 					pass
 				yield message,username,count
 		#messages()
+		def group_messages():
+			for mess in group_chat():
+				group_mess = mess
+
+				matched = ['image','photo','picture','draw','pic', 'stop']
+				try:
+					if "generate" in group_mess:
+						if "real" in group_mess:
+							paste = group_mess
+							dalle3(paste)
+						else:
+							paste = group_mess
+							image_generation(paste)
+						#send image
+						locate_image()
+						group_mess = ""
+				except TypeError:
+					pass
+				yield group_mess
 
 		#open chat
 		#chat = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]").click()
@@ -179,13 +226,14 @@ while True:
 			#reply message
 			try:
 				#check for group messages
-				message = group_chat()
-				send_mess(message)
+				for mess in group_messages():
+					message = mess
+					send_mess(message)
 				#single chats
 				for chats in chat():
 					message = chats
 					send_mess(message)
-					
+						
 			except (TypeError, NoSuchElementException):
 				pass
 		reply()

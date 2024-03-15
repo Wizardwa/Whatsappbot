@@ -29,7 +29,7 @@ def dalle3(paste):
             time.sleep(5)
             modal = driver.find_element(By.CLASS_NAME, 'modal-container')
             email = driver.find_element(By.ID, 'el-id-1024-44')
-            email.send_keys("ritixam303@usoplay.com")
+            email.send_keys("rojapo1659@usoplay.com")
             password = driver.find_element(By.ID, 'el-id-1024-45')
             password.send_keys("crapisgood")
             login_button = driver.find_element(By.XPATH, "/html/body/div[17]/div/div[1]/div[1]/div[6]").click()
@@ -44,7 +44,7 @@ def dalle3(paste):
                     print("Use another email")
                     driver.quit()
                 else:
-                    time.sleep(180)
+                    time.sleep(90)
                     image = driver.find_element(By.XPATH, "/html/body/div[4]/div/div[3]/div[2]/div/div[2]/div[3]/div[1]/div[1]/div[1]/img")
                     image_url = image.get_attribute("src")
                     def generate_random_word(length=5):
