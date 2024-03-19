@@ -1,14 +1,20 @@
 #!/bin/python3 
 
-import requests
+#Generate temporary mail
 
-url = "https://privatix-temp-mail-v1.p.rapidapi.com/request/one_mail/id/%7Bmail_id%7D/"
+import selenium
+from selenium import webdriver
+from selenium.webdriver import Chrome
+from selenium.webdriver import ChromeOptions
+import time
 
-headers = {
-	"X-RapidAPI-Key": "aebf7a7aa7mshb50d3412fbd4effp1bf3d0jsnf2c7cc167c68",
-	"X-RapidAPI-Host": "privatix-temp-mail-v1.p.rapidapi.com"
-}
 
-response = requests.get(url, headers=headers)
+opt = webdriver.ChromeOptions()
+opt.add_argument("--headless")
 
-print(response.json())
+driver = webdriver.Chrome()
+driver.get("https://10minutemail.net/")
+time.sleep(10)
+
+driver.quit()
+

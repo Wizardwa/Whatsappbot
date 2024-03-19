@@ -19,15 +19,19 @@ user_data = os.environ["chrome_user_data"]
 opt = webdriver.ChromeOptions()
 opt.add_argument(f'--user-data-dir={user_data}')
 #opt.add_argument("--headless")
+#opt.add_argument("--no-sandbox")
+
 driver = webdriver.Chrome(options=opt)
 driver.get("https://web.whatsapp.com")
 time.sleep(20)
 
 #Chat xpaths /html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]
+print("Starting bot ....")
 while True:
 	try:
 		#Check groups
 		def group_chat():
+			print("Checking for group messages ...")
 			try:
 				rows = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div")
 				no_rows = int(rows.get_attribute("aria-rowcount"))
@@ -83,6 +87,7 @@ while True:
 
 		#check all of unread messages
 		def all_unread():
+			print("Checking for unread messages ....")
 			#no of rows
 			rows = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div")
 			no_rows = int(rows.get_attribute("aria-rowcount"))
@@ -114,6 +119,7 @@ while True:
 		#all_unread()
 
 		def unread_preview():
+			print("Previewing unread messages ....")
 			func_call = all_unread()
 			for i in func_call:
 				no_unread = i[0]
@@ -133,6 +139,7 @@ while True:
 		unread_preview()
 
 		def locate_image():
+			print("Locating image ....")
 			image_name = subprocess.check_output(['./local_images.sh'], stderr=subprocess.STDOUT, text=True)
 			image_name = image_name.strip()
 			image_path = "images" + '/' + image_name
@@ -148,6 +155,7 @@ while True:
 
 		#message
 		def messages():
+			print("Parsing messages ....")
 			for k in all_unread():
 				message = k[2]
 				username = k[1]
@@ -170,6 +178,7 @@ while True:
 				yield message,username,count
 		#messages()
 		def group_messages():
+			print("Parsing group messages ....")
 			for mess in group_chat():
 				group_mess = mess
 
@@ -192,6 +201,7 @@ while True:
 		#open chat
 		#chat = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[3]/div/div[2]/div[1]/div/div/div[1]/div/div/div/div[2]").click()
 		def chat():
+			print("Opening chat ....")
 			for chat in messages():
 				count = chat[2]
 				username = chat[1]
@@ -204,25 +214,43 @@ while True:
 		#def reply_box(i):
 			
 		def send_mess(message):
+			print("Sending reply ....")
 			#gemini
 			print(message)
 			paste = message
 			if paste != "":
-				respond = response(paste)
-				reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
-				reply.click()
-				reply.send_keys(Keys.CONTROL + "a")
-				reply.send_keys(Keys.DELETE)
-				reply.send_keys(respond)
-				#for i in respond:
-				#	reply.send_keys(i)
+				if "thug" in paste:
+					respond = "Ewaat"
+					reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
+					reply.click()
+					reply.send_keys(Keys.CONTROL + "a")
+					reply.send_keys(Keys.DELETE)
+					reply.send_keys(respond)
+					#for i in respond:
+					#	reply.send_keys(i)
 
-				#send message
-				send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
-				#time.sleep(5)
+					#send message
+					send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
+					#time.sleep(5)
+				else:
+					respond = response(paste)
+					respond = re.sub('google', 'Ewaat', respond)
+					respond = re.sub('Google', 'Ewaat', respond)
+					reply = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]/p")
+					reply.click()
+					reply.send_keys(Keys.CONTROL + "a")
+					reply.send_keys(Keys.DELETE)
+					reply.send_keys(respond)
+					#for i in respond:
+					#	reply.send_keys(i)
+
+					#send message
+					send = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button").click()
+					#time.sleep(5)
 			else:
 				print("Cannot reply this message")
 		def reply():
+			print("Replying ...")
 			#reply message
 			try:
 				#check for group messages

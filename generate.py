@@ -119,5 +119,3 @@ def image_generation(paste):
 
 
 
-
-
