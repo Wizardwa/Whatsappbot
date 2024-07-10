@@ -200,7 +200,7 @@ while True:
 				mess = chat[0]
 				open_chat = driver.find_element(By.XPATH, f"/html/body/div[1]/div/div/div[2]/div[3]/div/div[3]/div[1]/div/div/div[{count}]").click()
 
-				time.sleep(5)
+				#time.sleep(5)
 				yield mess
 
 		#chat()
