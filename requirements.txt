@@ -1,7 +1,4 @@
-os
-sys
 pyautogui
-time
 screen_search
 tkinter
 pyscreenshot
